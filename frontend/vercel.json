@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    { "source": "/api-auth/:path*", "destination": "http://167.172.77.226:8081/:path*" },
+    { "source": "/api-customer/:path*", "destination": "http://167.172.77.226:8082/:path*" },
+    { "source": "/api-engagement/:path*", "destination": "http://167.172.77.226:8083/:path*" },
+    { "source": "/api-product/:path*", "destination": "http://167.172.77.226:8084/:path*" }
+  ]
+}
