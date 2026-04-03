@@ -4,22 +4,22 @@ import axios from "axios";
 import { toast } from "react-toastify";
 
 // =============================
-// 1. AXIOS INSTANCES (Khởi tạo trực tiếp với env để tránh lỗi Hoisting)
+// 1. AXIOS INSTANCES
 // =============================
 export const apiAuth = axios.create({
-  baseURL: import.meta.env.VITE_API_AUTH || import.meta.env.VITE_API_BASE_URL || "http://localhost:8081",
+  baseURL: import.meta.env.VITE_API_AUTH || "/api-auth",
 });
 
 export const apiCustomer = axios.create({
-  baseURL: import.meta.env.VITE_API_CUSTOMER || import.meta.env.VITE_CUSTOMER_API_BASE_URL || "http://localhost:8082",
+  baseURL: import.meta.env.VITE_API_CUSTOMER || "/api-customer",
 });
 
 export const apiEngagement = axios.create({
-  baseURL: import.meta.env.VITE_API_ENGAGEMENT || "http://localhost:8083",
+  baseURL: import.meta.env.VITE_API_ENGAGEMENT || "/api-engagement",
 });
 
 export const apiProduct = axios.create({
-  baseURL: import.meta.env.VITE_API_PRODUCT || "http://localhost:8084",
+  baseURL: import.meta.env.VITE_API_PRODUCT || "/api-product",
 });
 
 const api = apiClient;
