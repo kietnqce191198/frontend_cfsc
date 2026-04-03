@@ -48,7 +48,7 @@ const COLORS = {
     danger: "#d32f2f"
 };
 
-const API_BASE_URL = "http://localhost:8083";
+const API_BASE_URL = "/api-engagement";
 
 const Coupon: React.FC = () => {
     // States danh sách
