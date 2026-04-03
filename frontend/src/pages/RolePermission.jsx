@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 
-const API_BASE_URL = "http://localhost:8081";
+const API_BASE_URL = "/api-auth";
 
 /**
  * After role permissions change, mint a new access token so JWT authorities match DB (same as re-login).

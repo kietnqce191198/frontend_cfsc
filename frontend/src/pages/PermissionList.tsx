@@ -4,7 +4,7 @@ import PermissionForm from "../components/PermissionForm";
 import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
 
-const API_URL = "http://localhost:8081/api/permissions";
+const API_URL = "/api-auth/api/permissions";
 
 interface Permission {
     id: number;
