@@ -135,10 +135,10 @@ export const permissionApi = {
 // CONFIG URL
 // =============================
 const API_AUTH_URL =
-  import.meta.env.VITE_API_AUTH || "http://localhost:8081";
+  import.meta.env.VITE_API_AUTH || "/api-auth";
 
 const API_CUSTOMER_URL =
-  import.meta.env.VITE_API_CUSTOMER || "http://localhost:8082";
+  import.meta.env.VITE_API_CUSTOMER || "/api-customer";
 
 // =============================
 // AXIOS INSTANCE

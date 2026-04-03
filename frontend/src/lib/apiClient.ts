@@ -1,13 +1,16 @@
 import axios, { AxiosError, AxiosInstance, InternalAxiosRequestConfig } from 'axios';
 
 export const AUTH_API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || 'http://localhost:8081';
+  import.meta.env.VITE_API_AUTH || '/api-auth';
+
 export const CUSTOMER_API_BASE_URL =
-  import.meta.env.VITE_CUSTOMER_API_BASE_URL || 'http://localhost:8082';
+  import.meta.env.VITE_API_CUSTOMER || '/api-customer';
+
 export const ENGAGEMENT_API_BASE_URL =
-  import.meta.env.VITE_ENGAGEMENT_API_BASE_URL || 'http://localhost:8083';
+  import.meta.env.VITE_API_ENGAGEMENT || '/api-engagement';
+
 export const PRODUCTION_API_BASE_URL =
-  import.meta.env.VITE_PRODUCTION_API_BASE_URL || 'http://localhost:8084';
+  import.meta.env.VITE_PRODUCTION_API_BASE_URL || '/api-product';
 
 type RefreshResponse = {
   accessToken?: string;
