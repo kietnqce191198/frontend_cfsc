@@ -451,7 +451,7 @@ function CategoryPage() {
 
           formData.append("image", formState.image_file);
 
-          response = await categoryApi.createWithImage(formData);
+          response = await categoryApi.create(payload, formState.image_file);
         } else {
           response = await categoryApi.create(payload);
         }

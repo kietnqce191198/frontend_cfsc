@@ -479,12 +479,11 @@ create: (payload, imageFile) => {
   if (imageFile) {
     const formData = new FormData();
 
-    formData.append(
-      "data",
-      new Blob([JSON.stringify(payload)], {
-        type: "application/json",
-      })
-    );
+    Object.entries(payload).forEach(([key, value]) => {
+      if (value !== null && value !== undefined) {
+        formData.append(key, value);
+      }
+    });
 
     formData.append("image", imageFile);
 
