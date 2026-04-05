@@ -475,6 +475,7 @@ function CategoryPage() {
                  await loadCategories(createdId);
                  return;
                }
+
                const cleanId = String(editorTarget.id).split(':')[0];
                await categoryApi.update(cleanId, requestBody);
 
@@ -482,10 +483,10 @@ function CategoryPage() {
                resetEditor();
 
                const detailResponse = await categoryApi.getById(cleanId);
+
                if (detailResponse && detailResponse.data) {
                  setSelectedCategory(detailResponse.data);
                }
-
                await loadCategories(cleanId);
     } catch (error) {
       const message = getErrorMessage(error, "Category action failed.");
@@ -712,7 +713,7 @@ function CategoryPage() {
             </div>
 
             {selectedCategorySummary && (
-              <div className="category-detail-actions">
+                  <div className="category-detail-actions">
                 <button
                   type="button"
                   className="category-secondary-btn"
