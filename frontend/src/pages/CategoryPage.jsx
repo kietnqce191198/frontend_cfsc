@@ -482,6 +482,10 @@ function CategoryPage() {
 
       resetEditor();
       await loadCategories(selectedCategoryId);
+      if (selectedCategoryId) {
+        const res = await categoryApi.getById(selectedCategoryId);
+        setSelectedCategory(res.data);
+      }
     } catch (error) {
       toast.error(getErrorMessage(error, "Failed to save category."));
     } finally {
