@@ -476,19 +476,18 @@ export const categoryApi = {
     return res.data;
   },
   create: async (data) => {
-    const config =
-      typeof FormData !== "undefined" && data instanceof FormData
-        ? { headers: { "Content-Type": "multipart/form-data" } }
-        : undefined;
-    const res = await apiProduct.post("/categories", data, config);
+    const res = await apiProduct.post("/categories", data);
     return res.data;
   },
-  update: async (id, data) => {
-    const config =
-      typeof FormData !== "undefined" && data instanceof FormData
-        ? { headers: { "Content-Type": "multipart/form-data" } }
-        : undefined;
-    const res = await apiProduct.put(`/categories/${id}`, data, config);
+  update: async (rawId, data) => {
+    const cleanId = String(rawId).split(':')[0];
+
+    if (typeof FormData !== "undefined" && data instanceof FormData) {
+      const res = await apiProduct.post(`/categories/${cleanId}`, data);
+      return res.data;
+    }
+
+    const res = await apiProduct.put(`/categories/${cleanId}`, data);
     return res.data;
   },
   delete: async (id) => {
@@ -496,7 +495,6 @@ export const categoryApi = {
     return res.data;
   },
 };
-
 export const productApi = {
   // --- Product Basic CRUD ---
   getAll: async (params = {}) => {
