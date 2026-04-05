@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 const ProductImageManager = ({ product, onClose }) => {
   const [images, setImages] = useState(product.images || []);
   const [loading, setLoading] = useState(false);
-  const [deletingId, setDeletingId] = useState(null); // Theo dõi ảnh đang chờ xóa
+  const [deletingId, setDeletingId] = useState(null);
   
   const fileInputRef = useRef(null);
   const bulkInputRef = useRef(null);
@@ -165,14 +165,14 @@ const ProductImageManager = ({ product, onClose }) => {
           {loading && !deletingId && (
             <div className="image-loading-state">
               <div className="loader-spinner"></div>
-              <p>Dâu đang xử lý, đại ca đợi tí...</p>
+              <p>Processing...</p>
             </div>
           )}
 
           {!loading && images.length === 0 && (
             <div className="empty-state">
               <i className="fas fa-camera fa-3x"></i>
-              <p>No images yet. Upload some, đại ca!</p>
+              <p>No images yet. Upload some!</p>
             </div>
           )}
 
