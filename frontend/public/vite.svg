@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+    <defs>
+        <linearGradient id="cupGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#41D1FF" />
+            <stop offset="100%" stop-color="#BD34FE" />
+        </linearGradient>
+        <linearGradient id="steamGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#FFEA83" />
+            <stop offset="50%" stop-color="#FFDD35" />
+            <stop offset="100%" stop-color="#FFA800" />
+        </linearGradient>
+    </defs>
+
+    <path fill="url(#steamGradient)" d="M80,60 Q90,30 80,10 Q70,30 80,50 T80,60 Z" transform="translate(20, 0)" />
+    <path fill="url(#steamGradient)" d="M80,60 Q90,30 80,10 Q70,30 80,50 T80,60 Z" transform="translate(50, -10)" />
+    <path fill="url(#steamGradient)" d="M80,60 Q90,30 80,10 Q70,30 80,50 T80,60 Z" transform="translate(80, 0)" />
+
+    <path fill="url(#cupGradient)" d="M40,80 L216,80 L200,200 C198,220 180,236 160,236 L96,236 C76,236 58,220 56,200 Z" />
+
+    <path fill="none" stroke="url(#cupGradient)" stroke-width="20" d="M216,110 C245,110 245,170 216,170" stroke-linecap="round" />
+</svg>
