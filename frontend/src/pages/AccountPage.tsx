@@ -5,6 +5,7 @@ import apiClient from '../lib/apiClient';
 import { canAccessAdminWorkspace } from '../lib/roleUtils';
 import '../assets/style.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
+import { engagementHttp } from '../lib/apiClient';
 
 type MessageState = { type: 'success' | 'error'; text: string } | null;
 type ApiResponse<T> = { success: boolean; message: string; data: T };
@@ -204,18 +205,13 @@ const AccountPage: React.FC = () => {
     const fetchLoyalty = async (token: string) => {
         setIsLoyaltyLoading(true);
         try {
-            const res = await apiClient.get(`${ENG_BASE}/me/loyalty/current-points`, {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            });
+            const res = await engagementHttp.get('/me/loyalty/current-points');
+
             const data = res.data;
             setLoyaltyPoints(data?.current_points ?? 0);
             setLoyaltyTier(data?.tier || 'BRONZE');
         } catch (error) {
-            console.error("🚨 Loyalty Fetch Error:", error);
-            setLoyaltyPoints(null);
-            setLoyaltyTier(null);
+            console.error(" Loyalty Fetch Error:", error);
         } finally {
             setIsLoyaltyLoading(false);
         }

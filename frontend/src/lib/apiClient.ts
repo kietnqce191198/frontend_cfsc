@@ -179,4 +179,6 @@ const apiClient = createAuthAwareClient(AUTH_API_BASE_URL);
 /** Gọi customer-service (8082); cùng luồng refresh token với auth. */
 export const customerHttp = createAuthAwareClient(CUSTOMER_API_BASE_URL);
 
+export const engagementHttp = createAuthAwareClient(ENGAGEMENT_API_BASE_URL);
+
 export default apiClient;
