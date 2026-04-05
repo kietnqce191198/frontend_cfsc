@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
-import {customerApi} form "../services/api";
+import {customerApi} from "../services/api";
 import '../assets/order-history.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
