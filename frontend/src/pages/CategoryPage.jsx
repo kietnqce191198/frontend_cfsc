@@ -471,8 +471,10 @@ function CategoryPage() {
         return;
       }
 
-      const response = await categoryApi.update(editorTarget.id, requestBody);
-      const updatedId = response.data?.id || editorTarget.id;
+      const cleanId = String(editorTarget.id).split(':')[0];
+
+      const response = await categoryApi.update(cleanId, requestBody);
+      const updatedId = response.data?.id || cleanId;
       toast.success("Category updated successfully.");
       resetEditor();
       await loadCategories(updatedId);
