@@ -205,18 +205,24 @@ const AccountPage: React.FC = () => {
     const fetchLoyalty = async (token: string) => {
         setIsLoyaltyLoading(true);
         try {
-            const res = await engagementHttp.get('/me/loyalty/current-points');
+            const payload = JSON.parse(atob(token.split(".")[1]));
+            const userId = payload.userId;
 
+            const res = await engagementHttp.get('/me/loyalty/current-points', {
+                params: { userId: userId }
+            });
             const data = res.data;
             setLoyaltyPoints(data?.current_points ?? 0);
             setLoyaltyTier(data?.tier || 'BRONZE');
         } catch (error) {
-            console.error(" Loyalty Fetch Error:", error);
+            console.error("🚨 Loyalty Fetch Error:", error);
+            setLoyaltyPoints(null);
+            setLoyaltyTier(null);
         } finally {
             setIsLoyaltyLoading(false);
         }
     };
-   
+
 
     const saveAccount = (nextProfile: AccountProfile, avatarFile: File | null) => {
         const payload = new FormData();
