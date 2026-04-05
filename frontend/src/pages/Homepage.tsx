@@ -1249,7 +1249,7 @@ const Homepage: React.FC = () => {
 
             {/* menu section starts  */}
 
-            <section className="menu" id="menu">
+            <section className="menu">
 
                 <span className="section-eyebrow">Best Sellers</span>
                 <h1 className="heading">house favorites</h1>

@@ -75,7 +75,7 @@ const ProductSection: React.FC = () => {
     }
 
     return (
-        <section className="menu storefront-products" id="products">
+        <section className="menu storefront-products" id="menu">
             <span className="section-eyebrow">Signature Menu</span>
             <h1 className="heading">Our special products</h1>
             <br></br>
