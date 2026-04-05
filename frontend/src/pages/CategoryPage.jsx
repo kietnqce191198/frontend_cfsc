@@ -480,12 +480,6 @@ function CategoryPage() {
       const updatedId = response.data?.id || editorTarget.id;
       toast.success("Category updated successfully.");
       resetEditor();
-      if (updatedData) {
-                setSelectedCategory(updatedData);
-            }
-      if (updatedCategory) {
-                setSelectedCategory(updatedCategory);
-            }
       await loadCategories(updatedId);
     } catch (error) {
       const message = getErrorMessage(error, "Category action failed.");

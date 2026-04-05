@@ -487,7 +487,7 @@ export const categoryApi = {
       return res.data;
     }
 
-    const res = await apiProduct.put(`/categories/${cleanId}`, data);
+    const res = await apiProduct.post(`/categories/${cleanId}`, data);
     return res.data;
   },
   delete: async (id) => {
