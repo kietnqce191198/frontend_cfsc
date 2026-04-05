@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
+import {customerApi} form '../services/api';
 import '../assets/order-history.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
@@ -52,39 +53,34 @@ const OrderDetail: React.FC = () => {
     const formatDate = (str: string) => str ? new Date(str).toLocaleString('vi-VN') : 'N/A';
 
     useEffect(() => {
-            const fetchOrderDetail = async () => {
+        const fetchOrderDetail = async () => {
+            const token = localStorage.getItem('accessToken');
+            if (!token) {
+                navigate('/');
+                return;
+            }
+
+            try {
                 const token = localStorage.getItem('accessToken');
-                if (!token) {
-                    navigate('/');
-                    return;
-                }
-                try {
-                    setLoading(true);
-                    const payload = JSON.parse(atob(token.split(".")[1]));
+                            if (!token) return;
+                            const payload = JSON.parse(atob(token.split(".")[1]));
+                            const customerResp = await customerApi.getByUserId(payload.userId);
+                            const customerId = customerResp?.id || customerResp?.data?.id;
+                setLoading(true);
+                const response = await axios.get(`${API_BASE_URL}/customer/${customerId}/orders/${orderId}`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                setOrder(response.data.data || response.data);
+                setError(null);
+            } catch (err: any) {
+                setError(err.response?.data?.message);
+            } finally {
+                setLoading(false);
+            }
+        };
 
-                    const customerResp = await axios.get(`${API_BASE_URL}/api/customers/user/${payload.userId}`, {
-                        headers: { Authorization: `Bearer ${token}` }
-                    });
-                    const customerId = customerResp.data?.id || customerResp.data?.data?.id;
-
-                    const response = await axios.get(`${API_BASE_URL}/api/customers/${customerId}/orders/${orderId}`, {
-                        headers: { Authorization: `Bearer ${token}` }
-                    });
-
-                    setOrder(response.data.data || response.data);
-                    setError(null);
-                } catch (err: any) {
-                    console.error("BUG when fetch Order Detail:", err);
-
-                    const errorMessage = err.response?.data?.message || err.message || "Đã xảy ra lỗi không xác định";
-                    setError(errorMessage);
-                } finally {
-                    setLoading(false);
-                }
-            };
-
-            if (orderId) fetchOrderDetail();
-        }, [orderId, navigate]);
+        if (orderId) fetchOrderDetail();
+    }, [orderId, navigate]);
 
     if (loading) {
         return (
