@@ -462,28 +462,30 @@ function CategoryPage() {
       payload.parent_id = null;
     }
 
-    try {
-      const requestBody = formState.image_file
-        ? buildCategoryMultipartPayload(payload, formState.image_file)
-        : payload;
+   try {
+         const requestBody = formState.image_file
+           ? buildCategoryMultipartPayload(payload, formState.image_file)
+           : payload;
 
-      if (editorMode === "create") {
-        const response = await categoryApi.create(requestBody);
-        const createdId = response.data?.id || null;
-        toast.success("Category created successfully.");
-        resetEditor();
-        await loadCategories(createdId);
-        return;
-      }
+         if (editorMode === "create") {
+           const response = await categoryApi.create(requestBody);
+           const createdId = response.data?.id || null;
+           toast.success("Category created successfully.");
+           resetEditor();
+           await loadCategories(createdId);
+           return;
+         }
 
-      const response = await categoryApi.update(editorTarget.id, requestBody);
-      const updatedId = response.data?.id || editorTarget.id;
-      toast.success("Category updated successfully.");
-      resetEditor();
-      if (updatedCategory) {
-                setSelectedCategory(updatedCategory);
-            }
-      await loadCategories(updatedId);
+         const response = await categoryApi.update(editorTarget.id, requestBody);
+
+         const updatedData = response.data;
+         const updatedId = updatedData?.id || editorTarget.id;
+         toast.success("Category updated successfully.");
+         resetEditor();
+         if (updatedData) {
+           setSelectedCategory(updatedData);
+         }
+         await loadCategories(updatedId);
     } catch (error) {
       const message = getErrorMessage(error, "Category action failed.");
       toast.error(message);
