@@ -479,17 +479,17 @@ export const categoryApi = {
     const res = await apiProduct.post("/categories", data);
     return res.data;
   },
-  update: async (rawId, data) => {
-    const cleanId = String(rawId).split(':')[0];
+update: (id, data) => {
+  if (data instanceof FormData) {
+    return apiProduct.post(`/categories/${id}`, data, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+  }
 
-    if (typeof FormData !== "undefined" && data instanceof FormData) {
-      const res = await apiProduct.post(`/categories/${cleanId}`, data);
-      return res.data;
-    }
-
-    const res = await apiProduct.put(`/categories/${cleanId}`, data);
-    return res.data;
-  },
+  return apiProduct.put(`/categories/${id}`, data);
+},
   delete: async (id) => {
     const res = await apiProduct.delete(`/categories/${id}`);
     return res.data;
