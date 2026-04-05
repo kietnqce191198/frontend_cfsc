@@ -72,7 +72,7 @@ const OrderDetail: React.FC = () => {
                 setOrder(response.data.data || response.data);
                 setError(null);
             } catch (err: any) {
-                setError(err.response?.data?.message || "Không thể tải thông tin đơn hàng.");
+                setError(err.response?.data?.message);
             } finally {
                 setLoading(false);
             }
