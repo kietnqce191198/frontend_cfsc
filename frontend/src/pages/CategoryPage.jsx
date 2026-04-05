@@ -31,16 +31,14 @@ const appendMultipartField = (formData, name, value) => {
 
 const buildCategoryMultipartPayload = (payload, imageFile) => {
   const formData = new FormData();
-  appendMultipartField(formData, "name", payload.name);
-  appendMultipartField(formData, "slug", payload.slug);
-  appendMultipartField(formData, "description", payload.description);
-  appendMultipartField(formData, "displayOrder", payload.display_order);
-  appendMultipartField(formData, "display_order", payload.display_order);
-  appendMultipartField(formData, "parentId", payload.parent_id);
-  appendMultipartField(formData, "parent_id", payload.parent_id);
-  appendMultipartField(formData, "active", payload.active);
-  appendMultipartField(formData, "isActive", payload.active);
-  appendMultipartField(formData, "is_active", payload.active);
+
+  formData.append("name", payload.name);
+  formData.append("slug", payload.slug);
+  formData.append("description", payload.description);
+  formData.append("imageUrl", payload.image_url);
+  formData.append("displayOrder", payload.display_order);
+  formData.append("parentId", payload.parent_id);
+  formData.append("active", payload.active);
 
   if (imageFile) {
     formData.append("image", imageFile);
