@@ -410,12 +410,12 @@ function CategoryPage() {
   };
 
   const handleRemoveCurrentImage = () => {
-    setFormState((current) => ({
-      ...current,
+    setFormState((prev) => ({
+      ...prev,
       image_file: null,
-      image_url: "",
+      image_url: null,
+      preview: null
     }));
-    setImageInputKey((current) => current + 1);
   };
 
   const handleSubmit = async () => {
@@ -444,9 +444,7 @@ console.log("payload:", payload);
           const formData = new FormData();
 
           Object.entries(payload).forEach(([key, value]) => {
-            if (value !== null && value !== undefined) {
-              formData.append(key, value);
-            }
+            formData.append(key, value ?? "");
           });
 console.log("payload:", payload);
           formData.append("image", formState.image_file);
