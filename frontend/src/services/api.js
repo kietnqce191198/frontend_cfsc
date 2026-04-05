@@ -511,7 +511,7 @@ export const productApi = {
     return res.data;
   },
   // Alias cho getById
-  getProduct: (id) => apiProduct.get(`/products/${id}`),
+  getProduct: (id) => apiProduct.get(`/products/${id}/detail`),
 
   create: async (data) => {
     const res = await apiProduct.post("/products", data);
