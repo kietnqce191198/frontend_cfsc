@@ -202,36 +202,31 @@ const AccountPage: React.FC = () => {
         apiClient.get<ApiResponse<AccountProfile>>('/api/accounts/me');
 
     const fetchLoyalty = async (token: string) => {
-        setIsLoyaltyLoading(true);
-        try {
-            const res = await fetch(`${ENG_BASE}/me/loyalty/current-points`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            });
-            if (!res.ok) {
+            setIsLoyaltyLoading(true);
+            try {
+                const payload = JSON.parse(atob(token.split(".")[1]));
+                const userId = payload.userId;
+                const res = await apiClient.get(`${ENG_BASE}/me/loyalty/current-points`, {
+                    params: { userId: userId },
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                const data = res.data?.data || res.data;
+
+                const current = typeof data?.current_points === 'number'
+                    ? data.current_points
+                    : data?.current_points ?? 0;
+
+                setLoyaltyPoints(!Number.isNaN(Number(current)) ? current : 0);
+                setLoyaltyTier(data?.tier?.trim() ? data.tier : 'BRONZE');
+
+            } catch (error) {
+                console.error("🚨 Loyalty Fetch Error:", error);
                 setLoyaltyPoints(null);
                 setLoyaltyTier(null);
-                return;
+            } finally {
+                setIsLoyaltyLoading(false);
             }
-            const data = await res.json() as { current_points?: number | string; tier?: string };
-            const current = typeof data?.current_points === 'number'
-                ? data.current_points
-                : data?.current_points ?? 0;
-            if (!Number.isNaN(Number(current))) {
-                setLoyaltyPoints(current);
-            } else {
-                setLoyaltyPoints(0);
-            }
-            setLoyaltyTier(typeof data?.tier === 'string' && data.tier.trim() ? data.tier : 'BRONZE');
-        } catch {
-            setLoyaltyPoints(null);
-            setLoyaltyTier(null);
-        } finally {
-            setIsLoyaltyLoading(false);
-        }
-    };
+        };
    
 
     const saveAccount = (nextProfile: AccountProfile, avatarFile: File | null) => {
