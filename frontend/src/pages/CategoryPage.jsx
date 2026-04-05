@@ -29,23 +29,6 @@ const appendMultipartField = (formData, name, value) => {
   formData.append(name, String(value));
 };
 
-const buildCategoryMultipartPayload = (payload, imageFile) => {
-  const formData = new FormData();
-
-  formData.append("name", payload.name);
-  formData.append("slug", payload.slug);
-  formData.append("description", payload.description);
-  formData.append("imageUrl", payload.image_url);
-  formData.append("displayOrder", payload.display_order);
-  formData.append("parentId", payload.parent_id);
-  formData.append("active", payload.active);
-
-  if (imageFile) {
-    formData.append("image", imageFile);
-  }
-
-  return formData;
-};
 const flattenCategories = (categories, depth = 0, parent = null) =>
   categories.flatMap((category) => {
     const item = {
@@ -436,70 +419,71 @@ function CategoryPage() {
   };
 
   const handleSubmit = async () => {
-    if (!validateForm()) {
-      return;
-    }
+    if (!validateForm()) return;
 
     setIsSubmitting(true);
 
-    const payload = {
-      name: formState.name.trim(),
-      slug: formState.slug.trim(),
-      description: formState.description.trim(),
-      image_url: formState.image_url.trim(),
-      display_order:
-        formState.display_order === "" ? 0 : Number(formState.display_order),
-      active: formState.active,
-    };
-
-    if (editorMode === "create") {
-      payload.parent_id = formState.parent_id ? Number(formState.parent_id) : null;
-    } else if (formState.parent_id) {
-      payload.parent_id = Number(formState.parent_id);
-    } else if (editorTarget?.parent_id == null) {
-      payload.parent_id = null;
-    }
-
     try {
-      const requestBody = formState.image_file
-        ? buildCategoryMultipartPayload(payload, formState.image_file)
-        : payload;
+      const payload = {
+        name: formState.name.trim(),
+        slug: formState.slug.trim(),
+        description: formState.description || null,
+        parent_id: formState.parent_id || null,
+        display_order: Number(formState.display_order || 0),
+        active: formState.active,
+        image_url: formState.image_url || null,
+      };
 
+      let response;
+
+      // =========================
+      // CREATE
+      // =========================
       if (editorMode === "create") {
-        const response = await categoryApi.create(requestBody);
-        const createdId = response.data?.id || null;
-        toast.success("Category created successfully.");
-        resetEditor();
-        await loadCategories(createdId);
-        return;
+        if (formState.image_file) {
+          const formData = new FormData();
+
+          Object.entries(payload).forEach(([key, value]) => {
+            if (value !== null && value !== undefined) {
+              formData.append(key, value);
+            }
+          });
+
+          formData.append("image", formState.image_file);
+
+          response = await categoryApi.create(null, formState.image_file);
+        } else {
+          response = await categoryApi.create(payload);
+        }
+
+        toast.success("Category created successfully");
       }
 
-      const response = await categoryApi.update(editorTarget.id, requestBody);
-      const updatedId = response.data?.id || editorTarget.id;
-      toast.success("Category updated successfully.");
+      // =========================
+      // UPDATE
+      // =========================
+      else {
+        const formData = new FormData();
+        formData.append(
+          "data",
+          new Blob([JSON.stringify(payload)], {
+            type: "application/json",
+          })
+        );
+
+        if (formState.image_file) {
+          formData.append("image", formState.image_file);
+        }
+
+        response = await categoryApi.update(editorTarget.id, payload, formState.image_file);
+
+        toast.success("Category updated successfully");
+      }
+
       resetEditor();
-      await loadCategories(updatedId);
+      await loadCategories(selectedCategoryId);
     } catch (error) {
-      const message = getErrorMessage(error, "Category action failed.");
-      toast.error(message);
-
-      if (
-        message === "Category name is required" ||
-        message.includes("Category name")
-      ) {
-        setFormErrors((current) => ({ ...current, name: message }));
-      }
-
-      if (
-        message === "Category slug is required" ||
-        message === "Category slug already exists"
-      ) {
-        setFormErrors((current) => ({ ...current, slug: message }));
-      }
-
-      if (message === "Parent category not found") {
-        setFormErrors((current) => ({ ...current, parent_id: message }));
-      }
+      toast.error(getErrorMessage(error, "Failed to save category."));
     } finally {
       setIsSubmitting(false);
     }

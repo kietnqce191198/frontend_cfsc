@@ -475,20 +475,37 @@ export const categoryApi = {
     const res = await apiProduct.get(`/categories/${id}`);
     return res.data;
   },
-  create: async (data) => {
-    const res = await apiProduct.post("/categories", data);
-    return res.data;
-  },
-update: (id, data) => {
-  if (data instanceof FormData) {
-    return apiProduct.post(`/categories/${id}`, data, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
+create: (payload, imageFile) => {
+  if (imageFile) {
+    const formData = new FormData();
+
+    formData.append(
+      "data",
+      new Blob([JSON.stringify(payload)], {
+        type: "application/json",
+      })
+    );
+
+    formData.append("image", imageFile);
+
+    return apiProduct.post("/categories", formData);
   }
 
-  return apiProduct.put(`/categories/${id}`, data);
+  return apiProduct.post("/categories", payload);
+},
+update: (id, payload, imageFile) => {
+  const formData = new FormData();
+  formData.append(
+    "data",
+    new Blob([JSON.stringify(payload)], {
+      type: "application/json",
+    })
+  );
+
+  if (imageFile) {
+    formData.append("image", imageFile);
+  }
+  return apiProduct.post(`/categories/${id}`, formData);
 },
   delete: async (id) => {
     const res = await apiProduct.delete(`/categories/${id}`);
