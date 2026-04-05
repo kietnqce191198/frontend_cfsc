@@ -433,7 +433,7 @@ function CategoryPage() {
         active: formState.active,
         image_url: formState.image_url || null,
       };
-
+console.log("payload:", payload);
       let response;
 
       // =========================
@@ -448,7 +448,7 @@ function CategoryPage() {
               formData.append(key, value);
             }
           });
-
+console.log("payload:", payload);
           formData.append("image", formState.image_file);
 
           response = await categoryApi.create(payload, formState.image_file);
