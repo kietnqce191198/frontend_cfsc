@@ -492,18 +492,7 @@ create: (payload, imageFile) => {
 
   return apiProduct.post("/categories", payload);
 },
-update: (id, payload, imageFile) => {
-  const formData = new FormData();
-  formData.append(
-    "data",
-    new Blob([JSON.stringify(payload)], {
-      type: "application/json",
-    })
-  );
-
-  if (imageFile) {
-    formData.append("image", imageFile);
-  }
+update: (id, formData) => {
   return apiProduct.post(`/categories/${id}`, formData);
 },
   delete: async (id) => {
