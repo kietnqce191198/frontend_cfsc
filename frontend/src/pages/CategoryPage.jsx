@@ -428,7 +428,7 @@ function CategoryPage() {
         name: formState.name.trim(),
         slug: formState.slug.trim(),
         description: formState.description || null,
-        parent_id: formState.parent_id || null,
+        parent_id: formState.parent_id ? Number(formState.parent_id) : null,
         display_order: Number(formState.display_order || 0),
         active: formState.active,
         image_url: formState.image_url || null,
@@ -476,7 +476,11 @@ console.log("payload:", payload);
           formData.append("image", formState.image_file);
         }
 
-        response = await categoryApi.update(editorTarget.id, formData);
+        response = await categoryApi.update(
+          editorTarget.id,
+          payload,
+          formState.image_file
+        );
 
         toast.success("Category updated successfully");
       }
