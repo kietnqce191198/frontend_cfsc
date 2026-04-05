@@ -350,7 +350,7 @@ const ProductPage = () => {
         try {
             await productApi.assignTags(currentProductId, { tagIds: selectedTags });
 
-            const productRes = await productApi.getById(currentProductId);
+            const productRes = await productApi.getProduct(currentProductId);
             setProductTags(productRes?.data?.tags || []);
 
             showSuccess("Tags assigned successfully! 🏷️");
