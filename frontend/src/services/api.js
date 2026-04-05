@@ -467,24 +467,50 @@ export const engagementLoyaltyApi = {
 // 6. PRODUCTION & PRODUCT API (Port 8084)
 // =============================
 export const categoryApi = {
-  getAll: (params) => apiProduct.get("/categories", { params }),
+  getAll: async (params = {}) => {
+    const res = await apiProduct.get("/categories", { params });
+    return res.data;
+  },
+  getById: async (id) => {
+    const res = await apiProduct.get(`/categories/${id}`);
+    return res.data;
+  },
+create: (payload, imageFile) => {
+  if (imageFile) {
+    const formData = new FormData();
 
-  getById: (id) => apiProduct.get(`/categories/${id}`),
+    formData.append(
+      "data",
+      new Blob([JSON.stringify(payload)], {
+        type: "application/json",
+      })
+    );
 
-  // CREATE JSON
-  create: (payload) =>
-    apiProduct.post("/categories", payload),
+    formData.append("image", imageFile);
 
-  // CREATE WITH IMAGE
-  createWithImage: (formData) =>
-    apiProduct.post("/categories", formData),
+    return apiProduct.post("/categories", formData);
+  }
 
-  // UPDATE (MULTIPART)
-  update: (id, formData) =>
-    apiProduct.post(`/categories/${id}`, formData),
+  return apiProduct.post("/categories", payload);
+},
+update: (id, payload, imageFile) => {
+  const formData = new FormData();
+  formData.append(
+    "data",
+    new Blob([JSON.stringify(payload)], {
+      type: "application/json",
+    })
+  );
 
-  delete: (id) =>
-    apiProduct.delete(`/categories/${id}`),
+  if (imageFile) {
+    formData.append("image", imageFile);
+  }
+  return apiProduct.post(`/categories/${id}`, formData);
+},
+  delete: async (id) => {
+    const res = await apiProduct.delete(`/categories/${id}`);
+    return res.data;
+  },
 };
 export const productApi = {
   // --- Product Basic CRUD ---
