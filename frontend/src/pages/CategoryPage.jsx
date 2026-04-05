@@ -451,7 +451,7 @@ function CategoryPage() {
 
           formData.append("image", formState.image_file);
 
-          response = await categoryApi.create(null, formState.image_file);
+          response = await categoryApi.createWithImage(formData);
         } else {
           response = await categoryApi.create(payload);
         }
@@ -464,6 +464,7 @@ function CategoryPage() {
       // =========================
       else {
         const formData = new FormData();
+
         formData.append(
           "data",
           new Blob([JSON.stringify(payload)], {
@@ -475,13 +476,25 @@ function CategoryPage() {
           formData.append("image", formState.image_file);
         }
 
-        response = await categoryApi.update(editorTarget.id, payload, formState.image_file);
+        response = await categoryApi.update(editorTarget.id, formData);
 
         toast.success("Category updated successfully");
       }
 
+      // =========================
+      // REFRESH UI
+      // =========================
       resetEditor();
+
+      // reload list
       await loadCategories(selectedCategoryId);
+
+      // reload detail
+      if (selectedCategoryId) {
+        const res = await categoryApi.getById(selectedCategoryId);
+        setSelectedCategory(res.data);
+      }
+
     } catch (error) {
       toast.error(getErrorMessage(error, "Failed to save category."));
     } finally {
