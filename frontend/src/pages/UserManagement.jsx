@@ -16,34 +16,30 @@ function UserManagement() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // State cho Popup xác nhận xóa
-  const [showConfirm, setShowConfirm] = useState(false);
+  // =========================
+  // Popup & Notification States
+  // =========================
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState(null);
+  const [successPopup, setSuccessPopup] = useState({ show: false, message: "" });
 
-  // =========================
-  // Pagination states
-  // =========================
-  const [pageInput, setPageInput] = useState(0);
-  const [sizeInput, setSizeInput] = useState(10);
   const [page, setPage] = useState(0);
   const [size, setSize] = useState(10);
 
-  // =========================
-  // Loyalty states
-  // =========================
   const [showLoyalty, setShowLoyalty] = useState(false);
   const [loyaltyData, setLoyaltyData] = useState(null);
-  const [pointsHistory, setPointsHistory] = useState([]);
-  const [tierHistory, setTierHistory] = useState([]);
   const [activeTab, setActiveTab] = useState("info");
 
-  // =========================
-  // Fetch roles & users
-  // =========================
   useEffect(() => {
     fetchRoles();
     fetchUsers(page, size);
   }, [page, size]);
+
+  // Helper to show success notification popup
+  const showSuccess = (msg) => {
+    setSuccessPopup({ show: true, message: msg });
+    setTimeout(() => setSuccessPopup({ show: false, message: "" }), 2000);
+  };
 
   const fetchUsers = async (p = page, s = size) => {
     try {
@@ -53,7 +49,6 @@ function UserManagement() {
       setUsers(data);
     } catch {
       setError("Failed to load users");
-      toast.error("Failed to load users");
     } finally {
       setLoading(false);
     }
@@ -62,35 +57,34 @@ function UserManagement() {
   const fetchRoles = async () => {
     try {
       const res = await roleApi.getAllRoles();
+      console.log("ROLE DATA LOG:", res);
+
       let data = [];
-
-      if (Array.isArray(res)) data = res;
-      else if (Array.isArray(res?.data)) data = res.data;
-      else if (Array.isArray(res?.data?.content)) data = res.data.content;
-      else if (Array.isArray(res?.content)) data = res.content;
-      else if (Array.isArray(res?.data?.data)) data = res.data.data;
-      else if (Array.isArray(res?.data?.data?.content)) data = res.data.data.content;
-
+      if (Array.isArray(res)) {
+        data = res;
+      } else if (res?.data) {
+        if (Array.isArray(res.data)) {
+          data = res.data;
+        } else if (Array.isArray(res.data.data)) {
+          data = res.data.data;
+        } else if (Array.isArray(res.data.content)) {
+          data = res.data.content;
+        }
+      }
       setRoles(data);
     } catch (err) {
-      toast.error("Failed to load roles");
+      console.error("ROLE FETCH ERROR:", err);
+      toast.error("Failed to load roles list!");
     }
   };
 
-  const applyPagination = () => {
-    const p = Math.max(0, parseInt(pageInput, 10) || 0);
-    const s = Math.max(1, parseInt(sizeInput, 10) || 10);
-    setPage(p);
-    setSize(s);
-  };
-
   // =========================
-  // CRUD
+  // CRUD Actions
   // =========================
   const handleCreateUser = async (data) => {
     try {
       await userApi.createUser(data);
-      toast.success("User created");
+      showSuccess("User Created Successfully!");
       fetchUsers(page, size);
       setShowForm(false);
     } catch {
@@ -101,7 +95,7 @@ function UserManagement() {
   const handleUpdateUser = async (data) => {
     try {
       await userApi.updateUser(editingUser.id, data);
-      toast.success("Updated");
+      showSuccess("User Updated Successfully!");
       fetchUsers(page, size);
       setShowForm(false);
       setEditingUser(null);
@@ -115,78 +109,32 @@ function UserManagement() {
     setShowForm(true);
   };
 
+  const openDeleteModal = (id) => {
+    setSelectedUserId(id);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDeleteUser = async () => {
+    try {
+      await userApi.deleteUser(selectedUserId);
+      showSuccess("User Deleted Successfully!");
+      fetchUsers(page, size);
+    } catch {
+      toast.error("Delete failed");
+    } finally {
+      setShowDeleteModal(false);
+      setSelectedUserId(null);
+    }
+  };
+
   const handleToggleLock = async (id, status) => {
     try {
       if (status === "LOCKED") await userApi.unlockUser(id);
       else await userApi.lockUser(id);
       fetchUsers(page, size);
+      showSuccess(status === "LOCKED" ? "User Unlocked!" : "User Locked!");
     } catch {
       toast.error("Toggle lock failed");
-    }
-  };
-
-  // Mở Popup xác nhận khi ấn nút xóa
-  const handleDeleteClick = (id) => {
-    setSelectedUserId(id);
-    setShowConfirm(true);
-  };
-
-  // Hàm thực thi xóa sau khi người dùng bấm "Đồng ý"
-  const confirmDeleteUser = async () => {
-    try {
-      await userApi.deleteUser(selectedUserId);
-      toast.success("Deleted successfully");
-      fetchUsers(page, size);
-    } catch {
-      toast.error("Delete failed");
-    } finally {
-      setShowConfirm(false);
-      setSelectedUserId(null);
-    }
-  };
-
-  // =========================
-  // Loyalty
-  // =========================
-  const handleViewLoyalty = async (userId) => {
-    try {
-      const customerResp = await customerApi.getByUserId(userId);
-      const customerId = customerResp?.id;
-      if (!customerId) {
-        toast.error("Không tìm thấy customerId");
-        return;
-      }
-
-      const raw = await loyaltyApi.getLoyaltyInfo(customerId);
-      const res = raw?.data || raw;
-      setLoyaltyData({
-        currentTier: res.current_tier,
-        currentPoints: res.current_points,
-        lifetimePoints: res.lifetime_points,
-        tierProgress: res.tier_progress,
-      });
-
-      const rawPoints = await loyaltyApi.getPointsHistory(customerId);
-      setPointsHistory((rawPoints || []).map((p) => ({
-        type: p.type,
-        amount: p.amount,
-        description: p.description,
-        orderId: p.order_id,
-        createdAt: p.created_at,
-      })));
-
-      const rawTier = await loyaltyApi.getTierHistory(customerId);
-      setTierHistory((rawTier || []).map((t) => ({
-        fromTier: t.from_tier || t.fromTier,
-        toTier: t.to_tier || t.toTier,
-        reason: t.reason,
-        changedAt: t.changed_at || t.changedAt,
-      })));
-
-      setActiveTab("info");
-      setShowLoyalty(true);
-    } catch (err) {
-      toast.error("Loyalty API lỗi");
     }
   };
 
@@ -194,37 +142,41 @@ function UserManagement() {
     try {
       const res = await customerApi.getCustomerByUserId(user.id);
       const customerId = res.data?.data?.customerId || res.data?.customerId;
-
       if (!customerId) {
         navigate(`/admin/users/${user.id}`);
         return;
       }
       navigate(`/admin/customers/${customerId}`);
     } catch (error) {
-      if (error.response?.status === 404) {
-        navigate(`/admin/users/${user.id}`);
-      } else {
-        toast.error(error.response?.data?.message || "An error occurred");
-      }
+      navigate(`/admin/users/${user.id}`);
     }
   };
 
-  if (loading) {
-    return <div className="admin-container">Loading users...</div>;
-  }
+  const handleViewLoyalty = async (userId) => {
+    try {
+      const customerResp = await customerApi.getByUserId(userId);
+      const customerId = customerResp?.id;
+      if (!customerId) {
+        toast.error("Customer ID not found");
+        return;
+      }
+      const raw = await loyaltyApi.getLoyaltyInfo(customerId);
+      setLoyaltyData(raw?.data || raw);
+      setActiveTab("info");
+      setShowLoyalty(true);
+    } catch (err) {
+      toast.error("Loyalty API error");
+    }
+  };
 
-  if (error) {
-    return <div className="admin-container">{error}</div>;
-  }
+  if (loading) return <div className="admin-container">Loading users...</div>;
+  if (error) return <div className="admin-container">{error}</div>;
 
   return (
     <div className="product-page">
       <div className="product-header">
         <h2>👥 User Management</h2>
-        <button
-          className="create-btn"
-          onClick={() => { setEditingUser(null); setShowForm(true); }}
-        >
+        <button className="create-btn" onClick={() => { setEditingUser(null); setShowForm(true); }}>
           <i className="fas fa-user-plus"></i> Create User
         </button>
       </div>
@@ -232,18 +184,18 @@ function UserManagement() {
       <UserTable
         users={users}
         onToggleLock={handleToggleLock}
-        deleteUser={handleDeleteClick} // Đã đổi sang gọi Popup thay vì xóa luôn
+        deleteUser={openDeleteModal}
         editUser={handleEditUser}
         viewCustomerProfile={handleViewCustomerProfile}
         viewLoyalty={handleViewLoyalty}
       />
 
-      {/* FORM USER (CREATE/UPDATE) */}
+      {/* MODAL FORM (CREATE/UPDATE) */}
       {showForm && (
         <div className="modal-overlay" onClick={() => setShowForm(false)}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h3>{editingUser ? "🔄 Update User" : "✨ New User"}</h3>
+              <h3>{editingUser ? "Update User" : "New User"}</h3>
               <button className="close-modal" onClick={() => setShowForm(false)}>&times;</button>
             </div>
             <div className="modal-body">
@@ -259,40 +211,33 @@ function UserManagement() {
         </div>
       )}
 
-      {/* POPUP XÁC NHẬN XÓA */}
-      {showConfirm && (
-        <div className="modal-overlay" onClick={() => setShowConfirm(false)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: "400px" }}>
-            <div className="modal-header">
-              <h3>⚠️ Confirm Delete</h3>
-              <button className="close-modal" onClick={() => setShowConfirm(false)}>&times;</button>
-            </div>
-            <div className="modal-body" style={{ textAlign: "center", padding: "20px" }}>
-              <p style={{ fontSize: "1.6rem", marginBottom: "2rem" }}>
-                Are you sure you want to delete this user? This action cannot be undone.
-              </p>
-              <div style={{ display: "flex", justifyContent: "center", gap: "10px" }}>
-                <button
-                  className="link-btn"
-                  style={{ background: "#ccc", color: "#333" }}
-                  onClick={() => setShowConfirm(false)}
-                >
-                  Cancel
-                </button>
-                <button
-                  className="link-btn"
-                  style={{ background: "#dc3545", color: "white" }}
-                  onClick={confirmDeleteUser}
-                >
-                  Yes, Delete
-                </button>
-              </div>
+      {/* --- DELETE CONFIRMATION MODAL --- */}
+      {showDeleteModal && (
+        <div className="modal-overlay delete-overlay" onClick={() => setShowDeleteModal(false)}>
+          <div className="confirm-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="confirm-icon"><i className="fas fa-exclamation-triangle"></i></div>
+            <h3>Are you sure?</h3>
+            <p>This action will permanently delete the account. This cannot be undone!</p>
+            <div className="confirm-actions">
+              <button className="cancel-confirm-btn" onClick={() => setShowDeleteModal(false)}>Cancel</button>
+              <button className="delete-confirm-btn" onClick={confirmDeleteUser}>Delete Now!</button>
             </div>
           </div>
         </div>
       )}
 
-      {/* LOYALTY MODAL */}
+      {/* --- SUCCESS POPUP --- */}
+      {successPopup.show && (
+        <div className="modal-overlay success-overlay">
+          <div className="success-popup">
+            <div className="success-icon-circle"><i className="fas fa-check"></i></div>
+            <h4>{successPopup.message}</h4>
+            <div className="success-progress-bar"></div>
+          </div>
+        </div>
+      )}
+
+      {/* Loyalty Modal */}
       {showLoyalty && loyaltyData && (
         <div className="modal-overlay" onClick={() => setShowLoyalty(false)}>
           <div className="modal loyalty-modal" onClick={(e) => e.stopPropagation()}>
@@ -300,7 +245,10 @@ function UserManagement() {
               <h3>💎 Loyalty Member</h3>
               <button className="close-modal" onClick={() => setShowLoyalty(false)}>&times;</button>
             </div>
-            {/* ... Nội dung loyalty ... */}
+            <div className="modal-body">
+               <p>Current Tier: <strong>{loyaltyData.currentTier}</strong></p>
+               <p>Accumulated Points: <strong>{loyaltyData.currentPoints}</strong></p>
+            </div>
           </div>
         </div>
       )}
