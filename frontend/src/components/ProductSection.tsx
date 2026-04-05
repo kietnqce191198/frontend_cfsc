@@ -64,9 +64,8 @@ const ProductSection: React.FC = () => {
                 <div className="container">
                     <span className="section-eyebrow">Signature Menu</span>
                     <h1 className="heading">Our special products</h1>
-                    <p className="section-lead">
-                        A tighter edit of drinks and desserts that represent the store best without overwhelming the page.
-                    </p>
+                    <br>
+                    </br>
                     <div className="storefront-products__status">
                         Signature items will appear here once the product feed is ready.
                     </div>
