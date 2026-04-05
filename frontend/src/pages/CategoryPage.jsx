@@ -31,18 +31,23 @@ const appendMultipartField = (formData, name, value) => {
 
 const buildCategoryMultipartPayload = (payload, imageFile) => {
   const formData = new FormData();
-
   appendMultipartField(formData, "name", payload.name);
   appendMultipartField(formData, "slug", payload.slug);
   appendMultipartField(formData, "description", payload.description);
   appendMultipartField(formData, "displayOrder", payload.display_order);
-  appendMultipartField(formData, "active", payload.active);
+  appendMultipartField(formData, "display_order", payload.display_order);
   appendMultipartField(formData, "parentId", payload.parent_id);
-  formData.append("image", imageFile);
+  appendMultipartField(formData, "parent_id", payload.parent_id);
+  appendMultipartField(formData, "active", payload.active);
+  appendMultipartField(formData, "isActive", payload.active);
+  appendMultipartField(formData, "is_active", payload.active);
+
+  if (imageFile) {
+    formData.append("image", imageFile);
+  }
 
   return formData;
 };
-
 const flattenCategories = (categories, depth = 0, parent = null) =>
   categories.flatMap((category) => {
     const item = {
