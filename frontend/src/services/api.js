@@ -476,18 +476,21 @@ export const categoryApi = {
     return res.data;
   },
   create: async (data) => {
-    // Đã xóa config, để Axios tự auto set Header + Boundary
-    const res = await apiProduct.post("/categories", data);
+    const config =
+      typeof FormData !== "undefined" && data instanceof FormData
+        ? { headers: { "Content-Type": "multipart/form-data" } }
+        : undefined;
+    const res = await apiProduct.post("/categories", data, config);
     return res.data;
   },
   update: async (id, data) => {
-      if (typeof FormData !== "undefined" && data instanceof FormData) {
-        const res = await apiProduct.post(`/categories/${id}`, data);
-        return res.data;
-      }
-      const res = await apiProduct.put(`/categories/${id}`, data);
-      return res.data;
-    },
+    const config =
+      typeof FormData !== "undefined" && data instanceof FormData
+        ? { headers: { "Content-Type": "multipart/form-data" } }
+        : undefined;
+    const res = await apiProduct.put(`/categories/${id}`, data, config);
+    return res.data;
+  },
   delete: async (id) => {
     const res = await apiProduct.delete(`/categories/${id}`);
     return res.data;

@@ -39,9 +39,7 @@ const buildCategoryMultipartPayload = (payload, imageFile) => {
   appendMultipartField(formData, "active", payload.active);
   appendMultipartField(formData, "parentId", payload.parent_id);
   formData.append("image", imageFile);
-    if (imageFile) {
-    formData.append("image", imageFile);
-  }
+
   return formData;
 };
 
@@ -460,7 +458,9 @@ function CategoryPage() {
     }
 
     try {
-      const requestBody = buildCategoryMultipartPayload(payload, formState.image_file);
+      const requestBody = formState.image_file
+        ? buildCategoryMultipartPayload(payload, formState.image_file)
+        : payload;
 
       if (editorMode === "create") {
         const response = await categoryApi.create(requestBody);
@@ -471,10 +471,8 @@ function CategoryPage() {
         return;
       }
 
-      const cleanId = String(editorTarget.id).split(':')[0];
-
-      const response = await categoryApi.update(cleanId, requestBody);
-      const updatedId = response.data?.id || cleanId;
+      const response = await categoryApi.update(editorTarget.id, requestBody);
+      const updatedId = response.data?.id || editorTarget.id;
       toast.success("Category updated successfully.");
       resetEditor();
       await loadCategories(updatedId);
