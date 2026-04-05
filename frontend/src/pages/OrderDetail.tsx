@@ -60,7 +60,11 @@ const OrderDetail: React.FC = () => {
             }
 
             try {
-                const customerId = localStorage.getItem('customerId');
+                const token = localStorage.getItem('accessToken');
+                            if (!token) return;
+                            const payload = JSON.parse(atob(token.split(".")[1]));
+                            const customerResp = await customerApi.getByUserId(payload.userId);
+                            const customerId = customerResp?.id || customerResp?.data?.id;
                 setLoading(true);
                 const response = await axios.get(`${API_BASE_URL}/customer/${customerId}/orders/${orderId}`, {
                     headers: { Authorization: `Bearer ${token}` }
