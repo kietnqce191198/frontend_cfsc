@@ -442,12 +442,14 @@ function CategoryPage() {
       if (editorMode === "create") {
         if (formState.image_file) {
           const formData = new FormData();
+          formData.append("name", payload.name);
+          formData.append("slug", payload.slug);
+          formData.append("description", payload.description || "");
+          formData.append("parentId", payload.parent_id || "");
+          formData.append("displayOrder", payload.display_order);
+          formData.append("active", payload.active);
 
-          Object.entries(payload).forEach(([key, value]) => {
-            if (value !== null && value !== undefined) {
-              formData.append(key, value);
-            }
-          });
+          formData.append("imageUrl", payload.image_url || "");
 
           formData.append("image", formState.image_file);
 
@@ -455,7 +457,6 @@ function CategoryPage() {
         } else {
           response = await categoryApi.create(payload);
         }
-
         toast.success("Category created successfully");
       }
 
