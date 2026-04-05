@@ -481,8 +481,7 @@ function CategoryPage() {
       }
 
       resetEditor();
-      await loadCategories(editorTarget.id);
-      setSelectedCategoryId(editorTarget.id);
+      await loadCategories(selectedCategoryId);
     } catch (error) {
       toast.error(getErrorMessage(error, "Failed to save category."));
     } finally {
