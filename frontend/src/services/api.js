@@ -472,7 +472,7 @@ export const categoryApi = {
     return res.data;
   },
   getById: async (id) => {
-    const res = await apiProduct.get(`/categories/${id}`);
+    const res = await apiProduct.get(`/categories/${id}/detail`);
     return res.data;
   },
 create: (payload, imageFile) => {
