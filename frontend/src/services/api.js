@@ -481,10 +481,13 @@ export const categoryApi = {
     return res.data;
   },
   update: async (id, data) => {
-    // Đã xóa config, để Axios tự auto set Header + Boundary
-    const res = await apiProduct.put(`/categories/${id}`, data);
-    return res.data;
-  },
+      if (typeof FormData !== "undefined" && data instanceof FormData) {
+        const res = await apiProduct.post(`/categories/${id}`, data);
+        return res.data;
+      }
+      const res = await apiProduct.put(`/categories/${id}`, data);
+      return res.data;
+    },
   delete: async (id) => {
     const res = await apiProduct.delete(`/categories/${id}`);
     return res.data;
