@@ -58,25 +58,23 @@ const OrderDetail: React.FC = () => {
                     navigate('/');
                     return;
                 }
-
                 try {
                     setLoading(true);
                     const payload = JSON.parse(atob(token.split(".")[1]));
+
                     const customerResp = await axios.get(`${API_BASE_URL}/api/customers/user/${payload.userId}`, {
                         headers: { Authorization: `Bearer ${token}` }
                     });
                     const customerId = customerResp.data?.id || customerResp.data?.data?.id;
 
-                    const customerResp = await customerApi.getByUserId(payload.userId);
-                    const customerId = customerResp?.id || customerResp?.data?.id;
-                        const response = await axios.get(`${API_BASE_URL}/api/customers/${customerId}/orders/${orderId}`, {
+                    const response = await axios.get(`${API_BASE_URL}/api/customers/${customerId}/orders/${orderId}`, {
                         headers: { Authorization: `Bearer ${token}` }
                     });
 
                     setOrder(response.data.data || response.data);
                     setError(null);
                 } catch (err: any) {
-                    console.error("BIG BUG fetch Order Detail:", err);
+                    console.error("BUG when fetch Order Detail:", err);
 
                     const errorMessage = err.response?.data?.message || err.message || "Đã xảy ra lỗi không xác định";
                     setError(errorMessage);
@@ -85,8 +83,8 @@ const OrderDetail: React.FC = () => {
                 }
             };
 
-        if (orderId) fetchOrderDetail();
-    }, [orderId, navigate]);
+            if (orderId) fetchOrderDetail();
+        }, [orderId, navigate]);
 
     if (loading) {
         return (
