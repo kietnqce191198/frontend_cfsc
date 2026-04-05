@@ -464,28 +464,29 @@ function CategoryPage() {
 
    try {
          const requestBody = formState.image_file
-           ? buildCategoryMultipartPayload(payload, formState.image_file)
-           : payload;
+                 ? buildCategoryMultipartPayload(payload, formState.image_file)
+                 : payload;
 
-         if (editorMode === "create") {
-           const response = await categoryApi.create(requestBody);
-           const createdId = response.data?.id || null;
-           toast.success("Category created successfully.");
-           resetEditor();
-           await loadCategories(createdId);
-           return;
-         }
+               if (editorMode === "create") {
+                 const response = await categoryApi.create(requestBody);
+                 const createdId = response.data?.id || null;
+                 toast.success("Category created successfully.");
+                 resetEditor();
+                 await loadCategories(createdId);
+                 return;
+               }
+               const cleanId = String(editorTarget.id).split(':')[0];
+               await categoryApi.update(cleanId, requestBody);
 
-         const response = await categoryApi.update(editorTarget.id, requestBody);
+               toast.success("Category updated successfully.");
+               resetEditor();
 
-         const updatedData = response.data;
-         const updatedId = updatedData?.id || editorTarget.id;
-         toast.success("Category updated successfully.");
-         resetEditor();
-         if (updatedData) {
-           setSelectedCategory(updatedData);
-         }
-         await loadCategories(updatedId);
+               const detailResponse = await categoryApi.getById(cleanId);
+               if (detailResponse && detailResponse.data) {
+                 setSelectedCategory(detailResponse.data);
+               }
+
+               await loadCategories(cleanId);
     } catch (error) {
       const message = getErrorMessage(error, "Category action failed.");
       toast.error(message);
