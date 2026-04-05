@@ -39,7 +39,9 @@ const buildCategoryMultipartPayload = (payload, imageFile) => {
   appendMultipartField(formData, "active", payload.active);
   appendMultipartField(formData, "parentId", payload.parent_id);
   formData.append("image", imageFile);
-
+    if (imageFile) {
+    formData.append("image", imageFile);
+  }
   return formData;
 };
 
@@ -458,9 +460,7 @@ function CategoryPage() {
     }
 
     try {
-      const requestBody = formState.image_file
-        ? buildCategoryMultipartPayload(payload, formState.image_file)
-        : payload;
+      const requestBody = buildCategoryMultipartPayload(payload, formState.image_file);
 
       if (editorMode === "create") {
         const response = await categoryApi.create(requestBody);
