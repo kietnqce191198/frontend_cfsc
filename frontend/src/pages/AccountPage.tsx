@@ -39,7 +39,7 @@ type AccountFieldErrors = {
 
 const MAX_AVATAR_SIZE_BYTES = 5 * 1024 * 1024;
 const ALLOWED_AVATAR_TYPES = new Set(['image/jpeg', 'image/png', 'image/gif', 'image/webp']);
-const ENG_BASE = import.meta.env.VITE_ENGAGEMENT_BASE_URL || '/api-engagement';
+const ENG_BASE = '/api-engagement';
 const ACCOUNT_PROFILE_UPDATED_EVENT = 'account-profile-updated';
 
 const createEmptyProfile = (email = ''): AccountProfile => ({
