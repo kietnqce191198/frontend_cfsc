@@ -438,67 +438,82 @@ function CategoryPage() {
   };
 
   const handleSubmit = async () => {
-    if (!validateForm()) {
-      return;
-    }
+      if (!validateForm()) {
+        return;
+      }
 
-    setIsSubmitting(true);
+      setIsSubmitting(true);
 
-    const payload = {
-      name: formState.name.trim(),
-      slug: formState.slug.trim(),
-      description: formState.description.trim(),
-      image_url: formState.image_url.trim(),
-      display_order:
-        formState.display_order === "" ? 0 : Number(formState.display_order),
-      active: formState.active,
+      const payload = {
+        name: formState.name.trim(),
+        slug: formState.slug.trim(),
+        description: formState.description.trim(),
+        image_url: formState.image_url.trim(),
+        display_order:
+          formState.display_order === "" ? 0 : Number(formState.display_order),
+        active: formState.active,
+      };
+
+      if (editorMode === "create") {
+        payload.parent_id = formState.parent_id ? Number(formState.parent_id) : null;
+      } else if (formState.parent_id) {
+        payload.parent_id = Number(formState.parent_id);
+      } else if (editorTarget?.parent_id == null) {
+        payload.parent_id = null;
+      }
+
+      try {
+        const requestBody = formState.image_file
+          ? buildCategoryMultipartPayload(payload, formState.image_file)
+          : payload;
+
+        if (editorMode === "create") {
+          const response = await categoryApi.create(requestBody);
+          const createdId = response.data?.id || null;
+          toast.success("Category created successfully.");
+          resetEditor();
+          await loadCategories(createdId);
+          return;
+        }
+
+        const cleanId = String(editorTarget.id).split(':')[0];
+        const numericId = Number(cleanId);
+        await categoryApi.update(numericId, requestBody);
+
+        toast.success("Category updated successfully.");
+        resetEditor();
+
+        const detailResponse = await categoryApi.getById(numericId);
+        if (detailResponse && detailResponse.data) {
+          setSelectedCategory(detailResponse.data);
+        }
+        await loadCategories(numericId);
+
+      } catch (error) {
+        const message = getErrorMessage(error, "Category action failed.");
+        toast.error(message);
+
+        if (
+          message === "Category name is required" ||
+          message.includes("Category name")
+        ) {
+          setFormErrors((current) => ({ ...current, name: message }));
+        }
+
+        if (
+          message === "Category slug is required" ||
+          message === "Category slug already exists"
+        ) {
+          setFormErrors((current) => ({ ...current, slug: message }));
+        }
+
+        if (message === "Parent category not found") {
+          setFormErrors((current) => ({ ...current, parent_id: message }));
+        }
+      } finally {
+        setIsSubmitting(false);
+      }
     };
-
-    if (editorMode === "create") {
-      payload.parent_id = formState.parent_id ? Number(formState.parent_id) : null;
-    } else if (formState.parent_id) {
-      payload.parent_id = Number(formState.parent_id);
-    } else if (editorTarget?.parent_id == null) {
-      payload.parent_id = null;
-    }
-
-   try {
-         const cleanId = String(editorTarget.id).split(':')[0];
-               const numericId = Number(cleanId);
-               const response = await categoryApi.update(numericId, requestBody);
-
-               toast.success("Category updated successfully.");
-               resetEditor();
-
-               if (response && response.data) {
-                 setSelectedCategory(response.data);
-               }
-               await loadCategories(numericId);
-    } catch (error) {
-      const message = getErrorMessage(error, "Category action failed.");
-      toast.error(message);
-
-      if (
-        message === "Category name is required" ||
-        message.includes("Category name")
-      ) {
-        setFormErrors((current) => ({ ...current, name: message }));
-      }
-
-      if (
-        message === "Category slug is required" ||
-        message === "Category slug already exists"
-      ) {
-        setFormErrors((current) => ({ ...current, slug: message }));
-      }
-
-      if (message === "Parent category not found") {
-        setFormErrors((current) => ({ ...current, parent_id: message }));
-      }
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
 
   const handleDelete = async () => {
     if (!deleteTarget) {

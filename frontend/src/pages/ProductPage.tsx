@@ -350,7 +350,6 @@ const ProductPage = () => {
         try {
             await productApi.assignTags(currentProductId, { tagIds: selectedTags });
 
-            // Refresh product data
             const productRes = await productApi.getById(currentProductId);
             setProductTags(productRes?.data?.tags || []);
 
