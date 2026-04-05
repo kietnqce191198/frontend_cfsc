@@ -479,7 +479,7 @@ console.log("payload:", payload);
           payload,
           formState.image_file
         );
-
+console.log("FINAL PAYLOAD:", payload);
         toast.success("Category updated successfully");
       }
 
