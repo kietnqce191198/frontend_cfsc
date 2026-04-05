@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-const API_URL = "http://localhost:8081/api/permissions";
+const API_URL = "/api-auth/api/permissions";
 const getToken = () => localStorage.getItem("accessToken");
 
 export default function PermissionForm({ editing, onSuccess }) {

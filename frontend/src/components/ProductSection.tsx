@@ -28,10 +28,10 @@ const ProductSection: React.FC = () => {
 
     useEffect(() => {
         const fetchProducts = async () => {
-           
+            const API_BASE = import.meta.env.VITE_API_PRODUCT || '/api-product';
 
             try {
-                const res = await axios.get('http://localhost:8084/products/homepage');
+                const res = await axios.get(`${API_BASE}/products/homepage`);
                 setProducts(res.data?.content || res.data || []);
             } catch (error) {
                 console.error('Failed to fetch products', error);
