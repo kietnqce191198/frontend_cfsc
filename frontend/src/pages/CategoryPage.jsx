@@ -463,31 +463,17 @@ function CategoryPage() {
     }
 
    try {
-         const requestBody = formState.image_file
-                 ? buildCategoryMultipartPayload(payload, formState.image_file)
-                 : payload;
-
-               if (editorMode === "create") {
-                 const response = await categoryApi.create(requestBody);
-                 const createdId = response.data?.id || null;
-                 toast.success("Category created successfully.");
-                 resetEditor();
-                 await loadCategories(createdId);
-                 return;
-               }
-
-               const cleanId = String(editorTarget.id).split(':')[0];
-               await categoryApi.update(cleanId, requestBody);
+         const cleanId = String(editorTarget.id).split(':')[0];
+               const numericId = Number(cleanId);
+               const response = await categoryApi.update(numericId, requestBody);
 
                toast.success("Category updated successfully.");
                resetEditor();
 
-               const detailResponse = await categoryApi.getById(cleanId);
-
-               if (detailResponse && detailResponse.data) {
-                 setSelectedCategory(detailResponse.data);
+               if (response && response.data) {
+                 setSelectedCategory(response.data);
                }
-               await loadCategories(cleanId);
+               await loadCategories(numericId);
     } catch (error) {
       const message = getErrorMessage(error, "Category action failed.");
       toast.error(message);
