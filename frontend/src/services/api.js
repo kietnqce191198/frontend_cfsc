@@ -496,15 +496,16 @@ update: (id, payload, imageFile) => {
   const formData = new FormData();
   formData.append(
     "data",
-    new Blob([JSON.stringify(payload)], {
-      type: "application/json",
-    })
+    new Blob([JSON.stringify(payload)], { type: "application/json" })
   );
   if (imageFile) {
     formData.append("image", imageFile);
   }
-
-  return apiProduct.post(`/categories/${id}`, formData);
+  return apiProduct.post(`/categories/${id}`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
 },
   delete: async (id) => {
     const res = await apiProduct.delete(`/categories/${id}`);
