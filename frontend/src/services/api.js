@@ -526,7 +526,7 @@ export const productApi = {
   getProducts: (params) => apiProduct.get("/products", { params }),
 
   getById: async (id) => {
-    const res = await apiProduct.get(`/products/${id}`);
+    const res = await apiProduct.get(`/products/${id}/detail`);
     return res.data;
   },
   // Alias cho getById
