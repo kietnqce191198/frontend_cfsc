@@ -14,7 +14,7 @@ const ProductDetailPage = () => {
 
     const fetchDetail = async () => {
         try {
-            const res = await productApi.getById(Number(productId));
+            const res = await productApi.getProduct(Number(productId));
             setProduct(res?.data);
         } catch (err) {
             console.error("Fetch detail error:", err);
